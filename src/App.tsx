@@ -78,16 +78,15 @@ const RouterWithRecoveryHandler = () => {
           }}
         >
           <Routes>
-            {/* Public routes */}
-            <Route element={<Outlet />}>
-              <Route path="/login" element={<Login />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-            </Route>
+            {/* Public routes - outside of Authenticated wrapper */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Protected admin panel */}
             <Route
+              path="/*"
               element={
-                <Authenticated fallback={<CatchAllNavigate to="/login" />} key="auth-routes">
+                <Authenticated fallback={<CatchAllNavigate to="/login" />}>
                   <ModernLayout>
                     <Outlet />
                   </ModernLayout>
@@ -95,7 +94,7 @@ const RouterWithRecoveryHandler = () => {
               }
             >
               <Route index element={<NavigateToResource resource="tours" />} />
-              <Route path="/tours">
+              <Route path="tours">
                 <Route index element={<TourList />} />
                 <Route path="create" element={<TourCreate />} />
                 <Route path="edit/:id" element={<TourEdit />} />
