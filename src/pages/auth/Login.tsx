@@ -23,9 +23,23 @@ export const Login = () => {
     login({ email, password });
   };
 
-  const handleForgotPassword = () => {
-    navigate("/reset-password");
+  const handleForgotPassword = async () => {
+    if (!email) {
+      alert("Please enter your email first.");
+      return;
+    }
+  
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://admin.hawaiiantourco.com/reset-password",
+    });
+  
+    if (error) {
+      alert("Error sending reset link: " + error.message);
+    } else {
+      alert("Password reset link sent! Check your email.");
+    }
   };
+  
 
   return (
     <Box

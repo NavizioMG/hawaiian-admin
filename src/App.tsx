@@ -1,4 +1,3 @@
-// src/App.tsx
 import {
   Refine,
   Authenticated,
@@ -11,8 +10,14 @@ import {
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
 import routerBindings from "@refinedev/react-router";
-import { BrowserRouter, Routes, Route, Outlet, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Outlet,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import { DevtoolsProvider, DevtoolsPanel } from "@refinedev/devtools";
 import { dataProvider, liveProvider } from "@refinedev/supabase";
@@ -26,18 +31,23 @@ import { Login } from "./pages/auth/Login";
 import { ResetPassword } from "./pages/auth/ResetPassword";
 import "./App.css";
 
-function InnerApp() {
+// Wrap with custom router component so we can access navigate
+const RouterWithRecoveryHandler = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Handles Supabase password recovery redirect
   useEffect(() => {
-    const { data } = supabaseClient.auth.onAuthStateChange((event) => {
+    const { data: listener } = supabaseClient.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         navigate("/reset-password");
       }
     });
 
-    return () => data?.subscription.unsubscribe();
-  }, []);
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   return (
     <RefineKbarProvider>
@@ -67,16 +77,16 @@ function InnerApp() {
           }}
         >
           <Routes>
-            {/* Public Routes */}
+            {/* Public routes */}
             <Route element={<Outlet />}>
               <Route path="/login" element={<Login />} />
               <Route path="/reset-password" element={<ResetPassword />} />
             </Route>
 
-            {/* Protected Routes */}
+            {/* Protected admin panel */}
             <Route
               element={
-                <Authenticated fallback={<CatchAllNavigate to="/login" />} key="authenticated-routes">
+                <Authenticated fallback={<CatchAllNavigate to="/login" />} key="auth-routes">
                   <ModernLayout>
                     <Outlet />
                   </ModernLayout>
@@ -101,14 +111,12 @@ function InnerApp() {
       </DevtoolsProvider>
     </RefineKbarProvider>
   );
-}
+};
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
-      <InnerApp />
+      <RouterWithRecoveryHandler />
     </BrowserRouter>
   );
 }
-
-export default App;
