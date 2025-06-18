@@ -18,7 +18,7 @@ import {
   export const ResetPassword = () => {
     const navigate = useNavigate();
     const [password, setPassword] = useState("");
-    const [token, setToken] = useState("");
+
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
@@ -35,7 +35,6 @@ import {
         supabaseClient.auth.setSession({
           access_token: accessToken,
           refresh_token: params.get("refresh_token") || "",
-          token_type: "bearer",
         });
       } else {
         setError("Invalid or expired reset link.");

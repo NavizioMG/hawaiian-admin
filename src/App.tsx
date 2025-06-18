@@ -35,7 +35,7 @@ import "./App.css";
 // Wrap with custom router component so we can access navigate
 const RouterWithRecoveryHandler = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const_location = useLocation();
 
   // Handles Supabase password recovery redirect
   useEffect(() => {
@@ -86,7 +86,7 @@ const RouterWithRecoveryHandler = () => {
             <Route
               path="/*"
               element={
-                <Authenticated fallback={<CatchAllNavigate to="/login" />}>
+                <Authenticated v3LegacyAuthProviderCompatible fallback={<CatchAllNavigate to="/login" />}>
                   <ModernLayout>
                     <Outlet />
                   </ModernLayout>
