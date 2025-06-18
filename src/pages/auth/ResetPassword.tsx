@@ -6,11 +6,7 @@ import {
     Stack,
     TextField,
     Typography,
-    IconButton,
-    Snackbar,
-    Alert,
   } from "@mui/material";
-  import { Visibility, VisibilityOff } from "@mui/icons-material";
   import { useState, useEffect } from "react";
   import { useNavigate } from "react-router-dom";
   import { supabaseClient } from "../../utility";
@@ -18,23 +14,21 @@ import {
   export const ResetPassword = () => {
     const navigate = useNavigate();
     const [password, setPassword] = useState("");
-
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [showSnackbar, setShowSnackbar] = useState(false);
   
+    // Pull access token from URL hash and set Supabase session
     useEffect(() => {
       const hash = window.location.hash;
       const params = new URLSearchParams(hash.replace("#", "?"));
       const accessToken = params.get("access_token");
+      const refreshToken = params.get("refresh_token");
   
       if (accessToken) {
-        setToken(accessToken);
         supabaseClient.auth.setSession({
           access_token: accessToken,
-          refresh_token: params.get("refresh_token") || "",
+          refresh_token: refreshToken || "",
         });
       } else {
         setError("Invalid or expired reset link.");
@@ -42,23 +36,14 @@ import {
     }, []);
   
     const handleReset = async () => {
-      setError("");
-      if (password.length < 6) {
-        setError("Password must be at least 6 characters.");
-        return;
-      }
-  
       setLoading(true);
-  
       const { error } = await supabaseClient.auth.updateUser({ password });
   
       if (error) {
         setError(error.message);
-        setShowSnackbar(true);
       } else {
         setSuccess(true);
-        setShowSnackbar(true);
-        setTimeout(() => navigate("/login"), 2500);
+        setTimeout(() => navigate("/login"), 2000);
       }
   
       setLoading(false);
@@ -81,27 +66,17 @@ import {
           </Typography>
   
           {success ? (
-            <Typography color="success.main" align="center" fontWeight="bold">
-              🎉 Password updated! Redirecting...
+            <Typography color="success.main" align="center">
+              Password updated! Redirecting to login...
             </Typography>
           ) : (
             <Stack spacing={2}>
               <TextField
-                type={showPassword ? "text" : "password"}
+                type="password"
                 label="New Password"
                 fullWidth
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                InputProps={{
-                  endAdornment: (
-                    <IconButton
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  ),
-                }}
               />
               <Button
                 variant="contained"
@@ -119,19 +94,7 @@ import {
             </Stack>
           )}
         </Paper>
-  
-        <Snackbar
-          open={showSnackbar}
-          autoHideDuration={3000}
-          onClose={() => setShowSnackbar(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        >
-          {success ? (
-            <Alert severity="success">Password updated successfully!</Alert>
-          ) : (
-            <Alert severity="error">{error}</Alert>
-          )}
-        </Snackbar>
       </Box>
     );
   };
+  

@@ -10,14 +10,12 @@ import {
 } from "@mui/material";
 import { useLogin } from "@refinedev/core";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabaseClient } from "../../utility";
 
 export const Login = () => {
   const { mutate: login } = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
- 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

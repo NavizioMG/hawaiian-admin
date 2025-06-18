@@ -35,7 +35,7 @@ import "./App.css";
 // Wrap with custom router component so we can access navigate
 const RouterWithRecoveryHandler = () => {
   const navigate = useNavigate();
-  const_location = useLocation();
+  const location = useLocation();
 
   // Handles Supabase password recovery redirect
   useEffect(() => {
@@ -49,6 +49,11 @@ const RouterWithRecoveryHandler = () => {
       listener?.subscription.unsubscribe();
     };
   }, [navigate]);
+
+  // Debug: Log current path
+  useEffect(() => {
+    console.log("Current path:", location.pathname);
+  }, [location.pathname]);
 
   return (
     <RefineKbarProvider>
@@ -78,15 +83,15 @@ const RouterWithRecoveryHandler = () => {
           }}
         >
           <Routes>
-            {/* Public routes - outside of Authenticated wrapper */}
+            {/* Public routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-
-            {/* Protected admin panel */}
+            
+            {/* Protected routes */}
             <Route
-              path="/*"
+              path="/"
               element={
-                <Authenticated v3LegacyAuthProviderCompatible fallback={<CatchAllNavigate to="/login" />}>
+                <Authenticated key="authenticated-routes" fallback={<CatchAllNavigate to="/login" />}>
                   <ModernLayout>
                     <Outlet />
                   </ModernLayout>
@@ -94,13 +99,13 @@ const RouterWithRecoveryHandler = () => {
               }
             >
               <Route index element={<NavigateToResource resource="tours" />} />
-              <Route path="tours">
-                <Route index element={<TourList />} />
-                <Route path="create" element={<TourCreate />} />
-                <Route path="edit/:id" element={<TourEdit />} />
-              </Route>
-              <Route path="*" element={<ErrorComponent />} />
+              <Route path="tours" element={<TourList />} />
+              <Route path="tours/create" element={<TourCreate />} />
+              <Route path="tours/edit/:id" element={<TourEdit />} />
             </Route>
+            
+            {/* Catch all */}
+            <Route path="*" element={<ErrorComponent />} />
           </Routes>
 
           <RefineKbar />
