@@ -20,6 +20,8 @@ import { ModernLayout } from "./components/layout/ModernLayout";
 import { TourList } from "./components/tours/TourList";
 import { TourEdit } from "./components/tours/TourEdit";
 import { TourCreate } from "./components/tours/TourCreate";
+import { Login } from "./pages/auth/Login";
+import { ResetPassword } from "./pages/auth/ResetPassword";
 import "./App.css";
 
 function App() {
@@ -38,10 +40,10 @@ function App() {
                 list: "/tours",
                 create: "/tours/create",
                 edit: "/tours/edit/:id",
-                meta: { 
+                meta: {
                   canDelete: true,
                   label: "Tours",
-                  icon: "🏝️"
+                  icon: "🏝️",
                 },
               },
             ]}
@@ -52,9 +54,16 @@ function App() {
             }}
           >
             <Routes>
+              {/* Public Routes */}
+              <Route element={<Outlet />}>
+                <Route path="/login" element={<Login />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+              </Route>
+
+              {/* Protected Routes */}
               <Route
                 element={
-                  <Authenticated key="authenticated-routes" fallback={<CatchAllNavigate to="/login" />}>
+                  <Authenticated fallback={<CatchAllNavigate to="/login" />} key="authenticated-routes">
                     <ModernLayout>
                       <Outlet />
                     </ModernLayout>
@@ -69,16 +78,8 @@ function App() {
                 </Route>
                 <Route path="*" element={<ErrorComponent />} />
               </Route>
-              <Route
-                element={
-                  <Authenticated key="auth-pages" fallback={<Outlet />}>
-                    <NavigateToResource />
-                  </Authenticated>
-                }
-              >
-                {/* Add your login/register pages here if needed */}
-              </Route>
             </Routes>
+
             <RefineKbar />
             <UnsavedChangesNotifier />
             <DocumentTitleHandler />
