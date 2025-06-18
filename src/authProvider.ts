@@ -100,7 +100,7 @@ const authProvider: AuthBindings = {
       const { data, error } = await supabaseClient.auth.resetPasswordForEmail(
         email,
         {
-          redirectTo: `${window.location.origin}/update-password`,
+          redirectTo: `${window.location.origin}/reset-password`,
         }
       );
 
@@ -176,7 +176,7 @@ const authProvider: AuthBindings = {
 
     return {
       success: true,
-      redirectTo: "/",
+      redirectTo: "/login",
     };
   },
   onError: async (error) => {
