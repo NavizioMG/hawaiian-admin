@@ -1,26 +1,23 @@
 // /src/components/tours/TourListHeader.tsx
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { useNavigation } from "@refinedev/core";
 import { Box, Typography, Button, InputAdornment, Chip, Stack, IconButton, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import ClearAllIcon from '@mui/icons-material/ClearAll';
-import ClearIcon from "@mui/icons-material/Clear"; 
-
-// Import Icons for our new flag buttons
+import ClearIcon from "@mui/icons-material/Clear";
 import StarIcon from "@mui/icons-material/Star";
 import DiamondIcon from "@mui/icons-material/Diamond";
 import HomeIcon from "@mui/icons-material/Home";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CancelIcon from '@mui/icons-material/Cancel';
-
 import { GradientHeader, ActionButton, SearchInput } from "./styles/styledComponents";
 import { tourTheme } from "./styles/tourTheme";
 import { SearchableCategorySelect } from "./SearchableCategorySelect";
+import { Tour } from "../../interfaces/tour";
 
-// Config now includes icons for the new filter buttons
-const flagConfig = {
+const flagConfig: { [key: string]: { label: string; icon: JSX.Element; color: string; } } = {
   is_featured: { label: "Featured", icon: <StarIcon fontSize="small" />, color: tourTheme.colors.status.featured },
   is_vip: { label: "VIP", icon: <DiamondIcon fontSize="small" />, color: tourTheme.colors.status.vip },
   is_pinned: { label: "Pinned", icon: <PushPinIcon fontSize="small" />, color: tourTheme.colors.status.pinned },
@@ -28,7 +25,19 @@ const flagConfig = {
   is_unforgettable: { label: "Unforgettable", icon: <FavoriteIcon fontSize="small" />, color: tourTheme.colors.status.unforgettable }
 };
 
-export const TourListHeader = ({
+interface TourListHeaderProps {
+  search: string;
+  setSearch: (value: string) => void;
+  filtersState: any; 
+  toggleFlagFilter: (key: string) => void;
+  setFiltersState: (setter: (prev: any) => any) => void;
+  activeFilterCount: number;
+  clearAllFilters: () => void;
+  applyFilters: () => void;
+  tourData: readonly Tour[];
+}
+
+export const TourListHeader: React.FC<TourListHeaderProps> = ({
   search, setSearch,
   filtersState, toggleFlagFilter, setFiltersState,
   activeFilterCount,
@@ -45,9 +54,9 @@ export const TourListHeader = ({
   
   const flagCounts = useMemo(() => {
     if (!tourData) return {};
-    const counts = {};
+    const counts: { [key: string]: number } = {};
     Object.keys(flagConfig).forEach(key => {
-        counts[key] = tourData.filter(tour => tour[key]).length;
+        counts[key] = tourData.filter(tour => tour[key as keyof Tour]).length;
     });
     return counts;
   }, [tourData]);
@@ -93,7 +102,7 @@ export const TourListHeader = ({
             <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.7)', mr: 1, alignSelf: 'center' }}>Filters:</Typography>
             
             {Object.entries(flagConfig).map(([key, config]) => {
-                const state = filtersState[key];
+                const state = filtersState[key as keyof typeof filtersState];
                 const count = flagCounts[key] || 0;
                 
                 const getChipStyle = () => {
@@ -106,7 +115,7 @@ export const TourListHeader = ({
                     <Chip 
                         key={key}
                         icon={state === false ? <CancelIcon style={{ color: '#c62828' }} /> : config.icon}
-                        label={`${config.label} (${count})`}
+                        label={count > 0 ? `${config.label} (${count})` : config.label}
                         onClick={() => toggleFlagFilter(key)}
                         sx={{ ...getChipStyle(), transition: 'all 0.2s ease', '&:hover': { opacity: 0.8 }, cursor: 'pointer' }}
                     />
@@ -115,8 +124,8 @@ export const TourListHeader = ({
 
             <Box sx={{ minWidth: 200 }}>
                 <SearchableCategorySelect
-                    value={filtersState.category}
-                    onChange={(value) => setFiltersState((p) => ({ ...p, category: value }))}
+                    value={filtersState.category || ""}
+                    onChange={(value) => setFiltersState((p: any) => ({ ...p, category: value }))}
                     label="Category"
                     sx={{ 
                         "& .MuiOutlinedInput-root": { backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2 },
@@ -128,22 +137,17 @@ export const TourListHeader = ({
                 />
             </Box>
 
-            {/* FIX: Added the Island/Location filter dropdown back in */}
             <Box sx={{ minWidth: 150 }}>
               <FormControl size="small" fullWidth>
                 <InputLabel sx={{color: 'rgba(255,255,255,0.7)'}}>Location</InputLabel>
                 <Select
                   value={filtersState.location}
-                  onChange={(e) => setFiltersState((p) => ({ ...p, location: e.target.value }))}
+                  onChange={(e) => setFiltersState((p: any) => ({ ...p, location: e.target.value }))}
                   label="Location"
                   sx={{ 
-                      color: 'white', 
-                      '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
-                      '.MuiSvgIcon-root': { color: 'white' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.5)'},
-                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.5)'},
-                      backgroundColor: 'rgba(255,255,255,0.1)',
-                      borderRadius: 2
+                      color: 'white', '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
+                      '.MuiSvgIcon-root': { color: 'white' }, '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.5)'},
+                      backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2
                   }}
                 >
                   <MenuItem value="">All Islands</MenuItem>

@@ -1,45 +1,46 @@
 // /src/components/tours/styles/tourTheme.ts
 export const tourTheme = {
-    // Color palette
-    colors: {
-      primary: {
-        gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        main: "#667eea",
-        dark: "#764ba2"
-      },
-      secondary: {
-        tropical: "#00bcd4",
-        sunset: "#ff9800",
-        ocean: "#2196f3"
-      },
-      status: {
-        featured: "#ff9800",
-        vip: "#9c27b0", 
-        pinned: "#2196f3",
-        homepage: "#4caf50",
-        unforgettable: "#f44336"
-      },
-      categories: {
-        "Hiking": "#4caf50",
-        "Snorkel": "#00bcd4", 
-        "Kayak": "#03a9f4",
-        "Sunset Cruise": "#ff9800",
-        "Wildlife": "#8bc34a",
-        "Scenic": "#9c27b0",
-        "Adventure": "#f44336",
-        "Other": "#607d8b"
-      },
-      neutral: {
-        background: "#fafafa",
-        card: "#ffffff",
-        border: "#e0e0e0",
-        text: {
-          primary: "#1a1a1a",
-          secondary: "#666666",
-          light: "#999999"
-        }
-      }
+  // Color palette
+  colors: {
+    primary: {
+      gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      main: "#667eea",
+      dark: "#764ba2"
     },
+    secondary: {
+      tropical: "#00bcd4",
+      sunset: "#ff9800",
+      ocean: "#2196f3"
+    },
+    status: {
+      featured: "#ff9800",
+      vip: "#9c27b0", 
+      pinned: "#2196f3",
+      homepage: "#4caf50",
+      unforgettable: "#f44336"
+    },
+    // FIX: Added an index signature to allow TypeScript to safely access categories by a string variable.
+    categories: {
+      "Hiking": "#4caf50",
+      "Snorkel": "#00bcd4", 
+      "Kayak": "#03a9f4",
+      "Sunset Cruise": "#ff9800",
+      "Wildlife": "#8bc34a",
+      "Scenic": "#9c27b0",
+      "Adventure": "#f44336",
+      "Other": "#607d8b"
+    } as { [key: string]: string }, // This assertion fixes the indexing errors
+    neutral: {
+      background: "#fafafa",
+      card: "#ffffff",
+      border: "#e0e0e0",
+      text: {
+        primary: "#1a1a1a",
+        secondary: "#666666",
+        light: "#999999"
+      }
+    }
+  },
     
     // Spacing system (8px grid)
     spacing: {

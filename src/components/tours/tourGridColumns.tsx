@@ -2,19 +2,27 @@
 import { GridColDef } from "@mui/x-data-grid";
 import { Box, Typography, Tooltip, Chip, IconButton } from "@mui/material";
 import { EditButton } from "@refinedev/mui";
+import { SvgIconComponent } from "@mui/icons-material";
 
-// Import Icons and Configs
+// Import all the necessary icons for the Status column
 import StarIcon from "@mui/icons-material/Star";
-import HomeIcon from "@mui/icons-material/Home";
-import PushPinIcon from "@mui/icons-material/PushPin";
 import DiamondIcon from "@mui/icons-material/Diamond";
+import PushPinIcon from "@mui/icons-material/PushPin";
+import HomeIcon from "@mui/icons-material/Home";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import LaunchIcon from "@mui/icons-material/Launch";
 
 import { tourTheme } from "./styles/tourTheme";
+import { Tour } from "../../interfaces/tour";
 
-// Re-define configs here or import from a central config file
-const flagConfig = {
+// Define a type for our flag configuration
+interface FlagConfig {
+  icon: SvgIconComponent;
+  color: string;
+  label: string;
+}
+
+const flagConfig: { [key: string]: FlagConfig } = {
   is_featured: { icon: StarIcon, color: tourTheme.colors.status.featured, label: "Featured" },
   is_vip: { icon: DiamondIcon, color: tourTheme.colors.status.vip, label: "VIP" },
   is_pinned: { icon: PushPinIcon, color: tourTheme.colors.status.pinned, label: "Pinned" },
@@ -22,15 +30,14 @@ const flagConfig = {
   is_unforgettable: { icon: FavoriteIcon, color: tourTheme.colors.status.unforgettable, label: "Unforgettable" }
 };
 
-const islandConfig = {
+const islandConfig: { [key: string]: { emoji: string; color: string; name: string; } } = {
   "Oahu": { emoji: "🏝️", color: "#2196f3", name: "Oahu" },
   "Maui": { emoji: "🌺", color: "#ff9800", name: "Maui" },
   "Big Island": { emoji: "🌋", color: "#f44336", name: "Big Island" },
   "Kauai": { emoji: "🌿", color: "#4caf50", name: "Kauai" }
 };
 
-// This function generates the columns array, accepting the toggle handler as an argument.
-export const getTourColumns = (handleToggle: (id: string, field: string, current: boolean) => void): GridColDef[] => [
+export const getTourColumns = (handleToggle: (id: string, field: string, current: boolean) => void): GridColDef<Tour>[] => [
   {
     field: "image",
     headerName: "",
@@ -67,11 +74,11 @@ export const getTourColumns = (handleToggle: (id: string, field: string, current
     field: "category",
     headerName: "Category",
     width: 150,
-    renderCell: ({ value }) => value && <Chip label={value} size="small" variant="outlined" />,
+    renderCell: ({ value }) => (value ? <Chip label={value} size="small" variant="outlined" /> : null),
   },
   {
-    field: "toggles",
-    headerName: "Status", // RENAMED: from "Quick Actions" to "Status"
+    field: "status",
+    headerName: "Status",
     width: 180,
     sortable: false,
     renderCell: ({ row }) => (
@@ -79,7 +86,7 @@ export const getTourColumns = (handleToggle: (id: string, field: string, current
         {Object.keys(flagConfig).map(flag => {
           const config = flagConfig[flag];
           const IconComponent = config.icon;
-          const isActive = row[flag];
+          const isActive = row[flag as keyof Tour] as boolean;
           return (
             <Tooltip key={flag} title={`Toggle ${config.label}`}>
               <IconButton size="small" onClick={() => handleToggle(row.id, flag, isActive)} sx={{ color: isActive ? config.color : "#ccc" }}>
@@ -96,6 +103,8 @@ export const getTourColumns = (handleToggle: (id: string, field: string, current
     headerName: "Actions",
     width: 100,
     sortable: false,
+    align: "center",
+    headerAlign: "center",
     renderCell: ({ row }) => (
       <Box sx={{ display: "flex", gap: 0.5 }}>
         <Tooltip title="View on FareHarbor">

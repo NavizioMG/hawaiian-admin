@@ -7,9 +7,7 @@ import {
   Typography,
   Chip,
   Paper,
-  InputAdornment,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import CategoryIcon from '@mui/icons-material/Category';
 import { tourTheme } from './styles/tourTheme';
 
@@ -28,7 +26,7 @@ const categoryOptions = [
   "Walking Tour", "Whale Watch", "Winery", "Workshop", "Zipline", "Zoo", "Other"
 ];
 
-const categoryGroups = {
+const categoryGroups: { [key: string]: string[] } = {
   "Water Activities": ["Boat Rental", "Boat Tour", "Canoe", "Catamaran", "Cruise / Large Boat", "Dolphin", "Fishing", "Jet Boat", "Jet Ski", "Kayak", "Parasail", "Raft", "Sailing", "Scuba", "Snorkel", "SUP", "Surf", "Wakeboard", "Whale Watch"],
   "Land Adventures": ["ATV", "Bike Rental", "Bike Tour", "Bus Tour", "Climbing", "Hiking", "Horse", "Hunt", "Jeep", "Ropes Course", "Segway", "Walking Tour", "Zipline"],
   "Air Activities": ["Airplane", "Helicopter", "Paragliding / Hang Gliding", "Skydive"],
@@ -40,7 +38,7 @@ const categoryGroups = {
 };
 
 const getCategoryColor = (category: string): string => {
-  return tourTheme.colors.categories[category] || tourTheme.colors.categories.Other;
+  return (tourTheme.colors.categories as Record<string, string>)[category] || tourTheme.colors.categories.Other;
 };
 
 interface SearchableCategorySelectProps {
@@ -53,7 +51,7 @@ interface SearchableCategorySelectProps {
   required?: boolean;
   fullWidth?: boolean;
   currentCategory?: string;
-  sx?: object; // Allow passing sx prop for custom styling
+  sx?: object;
 }
 
 export const SearchableCategorySelect: React.FC<SearchableCategorySelectProps> = ({
@@ -72,7 +70,7 @@ export const SearchableCategorySelect: React.FC<SearchableCategorySelectProps> =
 
   const allOptions = useMemo(() => {
     const options = [...categoryOptions];
-    if (currentCategory && !categoryOptions.includes(currentCategory) && currentCategory !== "nan") {
+    if (currentCategory && !options.includes(currentCategory) && currentCategory !== "nan") {
       options.unshift(currentCategory);
     }
     return options;
@@ -85,7 +83,7 @@ export const SearchableCategorySelect: React.FC<SearchableCategorySelectProps> =
     return "Other";
   };
 
-  const renderOption = (props: any, option: string) => {
+  const renderOption = (props: React.HTMLAttributes<HTMLLIElement>, option: string) => {
     const group = getCategoryGroup(option);
     const color = getCategoryColor(option);
     const isCurrentCustom = currentCategory && !categoryOptions.includes(currentCategory) && option === currentCategory;
@@ -111,11 +109,11 @@ export const SearchableCategorySelect: React.FC<SearchableCategorySelectProps> =
   return (
     <Autocomplete
       value={value || null}
-      onChange={(event, newValue) => {
+      onChange={(_, newValue: string | null) => {
         onChange(newValue || '');
       }}
       inputValue={inputValue}
-      onInputChange={(event, newInputValue) => {
+      onInputChange={(_, newInputValue: string) => {
         setInputValue(newInputValue);
       }}
       options={allOptions}
@@ -129,19 +127,13 @@ export const SearchableCategorySelect: React.FC<SearchableCategorySelectProps> =
           helperText={helperText}
           fullWidth={fullWidth}
           variant="outlined"
-          sx={{
-            ...sx, // Apply passed-in sx prop
-            "& .MuiInputLabel-root.Mui-focused": {
-                color: 'white', // Ensure label is white when focused on dark bg
-            },
-          }}
+          sx={sx}
         />
       )}
       PaperComponent={({ children, ...props }) => (
         <Paper 
           {...props} 
           sx={{
-            // FIX: Explicitly set a solid white background to fix readability
             backgroundColor: 'white',
             borderRadius: tourTheme.borderRadius.md,
             boxShadow: tourTheme.shadows.hover,

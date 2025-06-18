@@ -1,41 +1,50 @@
 // /src/components/tours/TourList.tsx
+import { useEffect } from "react"; 
 import { useDataGrid } from "@refinedev/mui";
-import { DataGrid, GridOverlay } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridOverlay } from "@mui/x-data-grid";
 import { Box, Typography } from "@mui/material";
 import SearchOffIcon from '@mui/icons-material/SearchOff';
+import { Tour } from "../../interfaces/tour";
 import { useTourFilters } from "./hooks/useTourFilters";
 import { useTourActions } from "./hooks/useTourActions";
 import { getTourColumns } from "./tourGridColumns";
 import { TourListHeader } from "./TourListHeader";
 import { PageContainer, ContentArea } from "./styles/styledComponents";
-import { useEffect } from "react"; // Import useEffect
 
-function CustomNoRowsOverlay() { /* ... same as before ... */ }
+function CustomNoRowsOverlay() {
+  return (
+    <GridOverlay>
+      <Box sx={{ textAlign: 'center', p: 4 }}>
+        <SearchOffIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 1 }} />
+        <Typography variant="h6" gutterBottom>No Tours Found</Typography>
+        <Typography variant="body2" color="text.secondary">Try adjusting your search or filters.</Typography>
+      </Box>
+    </GridOverlay>
+  );
+}
 
 export const TourList = () => {
-  const { dataGridProps, setFilters } = useDataGrid({
+  const { dataGridProps, setFilters } = useDataGrid<Tour>({
     resource: "tours",
     pagination: { pageSize: 50 },
     hasPagination: true,
+    syncWithLocation: true,
   });
 
   const filterProps = useTourFilters(setFilters);
   const { handleToggle } = useTourActions();
 
-  // FIX: This useEffect makes the toggle buttons instant, but only when a filter is changed by the user.
+  // This useEffect applies filters whenever the user changes a filter setting.
   useEffect(() => {
-    // This applies all currently selected filters whenever a flag or other advanced filter changes.
     filterProps.applyFilters();
   }, [filterProps.filtersState, filterProps.applyFilters]);
 
-
-  const columns = getTourColumns(handleToggle);
+  const columns: GridColDef<Tour>[] = getTourColumns(handleToggle);
 
   return (
     <PageContainer>
       <TourListHeader 
         {...filterProps} 
-        // Pass the loaded data to the header to calculate counts
         tourData={dataGridProps.rows}
       />
       
@@ -43,7 +52,20 @@ export const TourList = () => {
         <DataGrid 
           {...dataGridProps} 
           columns={columns}
-          // ... other props ...
+          density="compact"
+          pageSizeOptions={[25, 50, 100]}
+          disableRowSelectionOnClick
+          autoHeight
+          loading={dataGridProps.loading}
+          slots={{
+            noRowsOverlay: CustomNoRowsOverlay,
+          }}
+          sx={{ 
+            border: 0,
+            '& .MuiDataGrid-footerContainer': {
+                borderTop: `1px solid #e0e0e0`
+            }
+          }}
         />
       </ContentArea>
     </PageContainer>

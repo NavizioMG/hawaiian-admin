@@ -22,13 +22,11 @@ import {
   Paper,
   Tooltip,
   Badge,
-  useTheme,
-  alpha,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
   ChevronLeft as ChevronLeftIcon,
-  Dashboard as DashboardIcon, // Use as a fallback icon
+  Dashboard as DashboardIcon,
   Logout as LogoutIcon,
   Settings as SettingsIcon,
   Person as PersonIcon,
@@ -53,7 +51,6 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ children }) => {
   const { menuItems } = useMenu();
   const { create } = useNavigation();
   const location = useLocation();
-  const theme = useTheme();
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setUserMenuAnchor(event.currentTarget);
@@ -113,7 +110,6 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ children }) => {
                   fontSize: "1.2rem",
                 }}
               >
-                {/* FIX: Replaced corrupted characters with a placeholder emoji */}
                 🏝️
               </Box>
               <Box>
@@ -143,7 +139,6 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ children }) => {
         <List sx={{ px: 1, py: 2, flex: 1 }}>
           {menuItems.map((item) => {
             const isActive = isActiveRoute(item.route || "");
-            // FIX: Replaced corrupted fallback character with a proper MUI icon
             const icon = item.meta?.icon || <DashboardIcon />;
             
             return (
@@ -243,7 +238,6 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ children }) => {
                   fontSize: "0.9rem",
                 }}
               >
-                {/* FIX: Replaced corrupted characters with initials */}
                 TM
               </Avatar>
             </ListItemIcon>
@@ -261,7 +255,6 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ children }) => {
         </Box>
       </Drawer>
 
-      {/* User Menu and Main Content Area... no changes needed below this line */}
       <Menu
         anchorEl={userMenuAnchor}
         open={Boolean(userMenuAnchor)}

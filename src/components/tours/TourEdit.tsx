@@ -3,9 +3,8 @@ import { useForm } from "@refinedev/react-hook-form";
 import { Edit, DeleteButton } from "@refinedev/mui";
 import { useNotification } from "@refinedev/core";
 import { useWatch } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom"; // Import useNavigate
+import { useNavigate, useParams } from "react-router-dom";
 import {
-  Box,
   Typography,
   Grid,
   Chip,
@@ -29,7 +28,7 @@ export const TourEdit = () => {
   const { open } = useNotification();
   const initialized = useRef(false);
   const { id } = useParams();
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
   const {
     saveButtonProps,
@@ -74,7 +73,6 @@ export const TourEdit = () => {
       reset(formValues);
     }
   }, [queryResult?.data?.data, reset]);
-
 
   const watchedValues = watch();
   const title = useWatch({ control, name: "title" });
@@ -128,10 +126,8 @@ export const TourEdit = () => {
           headerButtons={
             <Stack direction="row" spacing={2}>
               <DeleteButton
-                // THE FIX: Explicitly pass the record's ID to the button.
                 recordItemId={id}
                 variant="outlined"
-                // For a better UX, we can also tell it where to go after success.
                 onSuccess={() => {
                   navigate("/tours");
                 }}

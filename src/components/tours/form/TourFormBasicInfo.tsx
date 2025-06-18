@@ -2,7 +2,6 @@
 import { Controller } from "react-hook-form";
 import {
   Autocomplete,
-  Box,
   CardContent,
   CardHeader,
   Chip,
@@ -11,7 +10,6 @@ import {
   TextField,
 } from "@mui/material";
 import DescriptionIcon from "@mui/icons-material/Description";
-import TagIcon from "@mui/icons-material/Tag";
 import { StyledCard } from "../styles/styledComponents";
 import { tourTheme } from "../styles/tourTheme";
 
@@ -40,7 +38,6 @@ export const TourFormBasicInfo = ({ control, errors, register }: TourFormBasicIn
             fullWidth
             label="Tour Title"
             placeholder="Enter an engaging tour title..."
-            // FIX: Add InputLabelProps to ensure the label always floats correctly
             InputLabelProps={{ shrink: true }}
           />
 
@@ -49,7 +46,6 @@ export const TourFormBasicInfo = ({ control, errors, register }: TourFormBasicIn
             fullWidth
             label="Item ID"
             placeholder="Unique identifier..."
-            // FIX: Add InputLabelProps to ensure the label always floats correctly
             InputLabelProps={{ shrink: true }}
           />
 
@@ -59,7 +55,6 @@ export const TourFormBasicInfo = ({ control, errors, register }: TourFormBasicIn
             label="URL Slug"
             placeholder="url-friendly-version"
             helperText="Auto-generated from title, but you can customize it"
-            // FIX: Add InputLabelProps to ensure the label always floats correctly
             InputLabelProps={{ shrink: true }}
           />
 
@@ -70,7 +65,6 @@ export const TourFormBasicInfo = ({ control, errors, register }: TourFormBasicIn
             placeholder="Describe the amazing experience..."
             multiline
             rows={4}
-            // FIX: Add InputLabelProps to ensure the label always floats correctly
             InputLabelProps={{ shrink: true }}
           />
 

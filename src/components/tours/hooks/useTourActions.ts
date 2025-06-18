@@ -1,9 +1,10 @@
+// /src/components/tours/hooks/useTourActions.ts
 import { useUpdate } from "@refinedev/core";
 
 export const useTourActions = () => {
   const { mutate } = useUpdate();
 
-  const handleToggle = (id, field, current) => {
+  const handleToggle = (id: string, field: string, current: boolean) => {
     mutate({
       resource: "tours",
       id,
@@ -12,8 +13,8 @@ export const useTourActions = () => {
     });
   };
 
-  const handleBulkUpdate = (ids, updates) => {
-    ids.forEach(id => {
+  const handleBulkUpdate = (ids: string[], updates: Record<string, any>) => {
+    ids.forEach((id: string) => {
       mutate({
         resource: "tours", 
         id,
