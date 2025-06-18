@@ -1,24 +1,27 @@
+// App.tsx
 import {
+  Refine,
   Authenticated,
   AuthPage,
   ErrorComponent,
-  GitHubBanner,
-  Refine,
 } from "@refinedev/core";
-import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-
-import routerBindings, {
+import {
   CatchAllNavigate,
   DocumentTitleHandler,
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
+import routerBindings from "@refinedev/react-router";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+
+import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+import { DevtoolsProvider, DevtoolsPanel } from "@refinedev/devtools";
 import { dataProvider, liveProvider } from "@refinedev/supabase";
-import { BrowserRouter, Outlet, Route, Routes } from "react-router";
-import "./App.css";
+
 import authProvider from "./authProvider";
-import { Layout } from "./components/layout";
+import { supabaseClient } from "./utility";
+import { ModernLayout } from "./components/layout/ModernLayout";
+
 import {
   BlogPostCreate,
   BlogPostEdit,
@@ -31,28 +34,50 @@ import {
   CategoryList,
   CategoryShow,
 } from "./pages/categories";
-import { supabaseClient } from "./utility";
+
+// Import our new tour components
+import { TourList } from "./components/tours/TourList";
+import { TourEdit } from "./components/tours/TourEdit";
+import { TourCreate } from "./components/tours/TourCreate";
+import { TourShow } from "./pages/tours"; // Keep the existing show component
+
+import "./App.css";
 
 function App() {
   return (
     <BrowserRouter>
-      <GitHubBanner />
       <RefineKbarProvider>
         <DevtoolsProvider>
           <Refine
-            dataProvider={dataProvider(supabaseClient)}
+            dataProvider={dataProvider(supabaseClient, {
+              defaultIdField: "id",
+            })}
             liveProvider={liveProvider(supabaseClient)}
             authProvider={authProvider}
             routerProvider={routerBindings}
             resources={[
+              {
+                name: "tours",
+                list: "/tours",
+                create: "/tours/create",
+                edit: "/tours/edit/:id",
+                show: "/tours/show/:id",
+                meta: { 
+                  canDelete: true,
+                  label: "Tours",
+                  icon: "🏝️"
+                },
+              },
               {
                 name: "blog_posts",
                 list: "/blog-posts",
                 create: "/blog-posts/create",
                 edit: "/blog-posts/edit/:id",
                 show: "/blog-posts/show/:id",
-                meta: {
+                meta: { 
                   canDelete: true,
+                  label: "Blog Posts",
+                  icon: "📝"
                 },
               },
               {
@@ -61,92 +86,67 @@ function App() {
                 create: "/categories/create",
                 edit: "/categories/edit/:id",
                 show: "/categories/show/:id",
-                meta: {
+                meta: { 
                   canDelete: true,
+                  label: "Categories",
+                  icon: "🏷️"
                 },
               },
             ]}
             options={{
-              syncWithLocation: true,
-              warnWhenUnsavedChanges: true,
-              useNewQueryKeys: true,
               projectId: "y0D8Tb-Yj3MjK-aZfCzT",
+              syncWithLocation: true,
+              useNewQueryKeys: true,
+              warnWhenUnsavedChanges: true,
+              breadcrumb: false, // Remove breadcrumbs
             }}
           >
             <Routes>
               <Route
                 element={
-                  <Authenticated
-                    key="authenticated-inner"
-                    fallback={<CatchAllNavigate to="/login" />}
-                  >
-                    <Layout>
+                  <Authenticated fallback={<CatchAllNavigate to="/login" />}>
+                    <ModernLayout>
                       <Outlet />
-                    </Layout>
+                    </ModernLayout>
                   </Authenticated>
                 }
               >
-                <Route
-                  index
-                  element={<NavigateToResource resource="blog_posts" />}
-                />
+                <Route index element={<NavigateToResource resource="tours" />} />
+
+                <Route path="/tours">
+                  <Route index element={<TourList />} />
+                  <Route path="create" element={<TourCreate />} />
+                  <Route path="edit/:id" element={<TourEdit />} />
+                  <Route path="show/:id" element={<TourShow />} />
+                </Route>
+
                 <Route path="/blog-posts">
                   <Route index element={<BlogPostList />} />
                   <Route path="create" element={<BlogPostCreate />} />
                   <Route path="edit/:id" element={<BlogPostEdit />} />
                   <Route path="show/:id" element={<BlogPostShow />} />
                 </Route>
+
                 <Route path="/categories">
                   <Route index element={<CategoryList />} />
                   <Route path="create" element={<CategoryCreate />} />
                   <Route path="edit/:id" element={<CategoryEdit />} />
                   <Route path="show/:id" element={<CategoryShow />} />
                 </Route>
+
                 <Route path="*" element={<ErrorComponent />} />
               </Route>
+
               <Route
                 element={
-                  <Authenticated
-                    key="authenticated-outer"
-                    fallback={<Outlet />}
-                  >
+                  <Authenticated fallback={<Outlet />}>
                     <NavigateToResource />
                   </Authenticated>
                 }
               >
-                <Route
-                  path="/login"
-                  element={
-                    <AuthPage
-                      type="login"
-                      renderContent={(content) => (
-                        <div>
-                          <p
-                            style={{
-                              padding: 10,
-                              color: "#004085",
-                              backgroundColor: "#cce5ff",
-                              borderColor: "#b8daff",
-                              textAlign: "center",
-                            }}
-                          >
-                            email: info@refine.dev
-                            <br /> password: refine-supabase
-                          </p>
-                          {content}
-                        </div>
-                      )}
-                    />
-                  }
-                />
-                <Route
-                  path="/register"
-                  element={<AuthPage type="register" />}
-                />
-                <Route
-                  path="/forgot-password"
-                  element={<AuthPage type="forgotPassword" />}
-                />
+                <Route path="/login" element={<AuthPage type="login" />} />
+                <Route path="/register" element={<AuthPage type="register" />} />
+                <Route path="/forgot-password" element={<AuthPage type="forgotPassword" />} />
               </Route>
             </Routes>
 
