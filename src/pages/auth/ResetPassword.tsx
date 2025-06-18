@@ -13,7 +13,7 @@ import {
   import { Visibility, VisibilityOff } from "@mui/icons-material";
   import { useState, useEffect } from "react";
   import { useNavigate } from "react-router-dom";
-  import { supabaseClient } from "@/utility";
+  import { supabaseClient } from "../../utility";
   
   export const ResetPassword = () => {
     const navigate = useNavigate();
@@ -136,4 +136,3 @@ import {
       </Box>
     );
   };
-  

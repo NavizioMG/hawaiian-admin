@@ -18,6 +18,7 @@ import {
   useNavigate,
   useLocation,
 } from "react-router-dom";
+import { useEffect } from "react";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 import { DevtoolsProvider, DevtoolsPanel } from "@refinedev/devtools";
 import { dataProvider, liveProvider } from "@refinedev/supabase";

@@ -11,6 +11,7 @@ import {
 import { useLogin } from "@refinedev/core";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabaseClient } from "../../utility";
 
 export const Login = () => {
   const { mutate: login } = useLogin();
