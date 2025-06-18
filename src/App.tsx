@@ -21,6 +21,7 @@ import { dataProvider, liveProvider } from "@refinedev/supabase";
 import authProvider from "./authProvider";
 import { supabaseClient } from "./utility";
 import { ModernLayout } from "./components/layout/ModernLayout";
+import { Login } from "./pages/auth/Login";
 
 import {
   BlogPostCreate,
@@ -55,6 +56,7 @@ function App() {
             liveProvider={liveProvider(supabaseClient)}
             authProvider={authProvider}
             routerProvider={routerBindings}
+            LoginPage={Login}
             resources={[
               {
                 name: "tours",
