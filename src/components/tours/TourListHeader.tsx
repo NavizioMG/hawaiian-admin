@@ -1,7 +1,7 @@
 // /src/components/tours/TourListHeader.tsx
 import React, { useMemo } from "react";
 import { useNavigation } from "@refinedev/core";
-import { Box, Typography, Button, InputAdornment, Chip, Stack, IconButton, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { Box, Typography, Button, InputAdornment, Chip, Stack, IconButton, FormControl, InputLabel, Select, MenuItem, useMediaQuery, useTheme } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import ClearAllIcon from '@mui/icons-material/ClearAll';
@@ -46,6 +46,8 @@ export const TourListHeader: React.FC<TourListHeaderProps> = ({
   tourData
 }) => {
   const { create } = useNavigation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -63,24 +65,36 @@ export const TourListHeader: React.FC<TourListHeaderProps> = ({
 
   return (
     <GradientHeader elevation={0}>
-      <Stack spacing={2} sx={{ p: tourTheme.spacing.md }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack spacing={2} sx={{ p: { xs: 2, md: tourTheme.spacing.md } }}>
+        <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" alignItems={{ xs: "flex-start", md: "center" }} spacing={2}>
           <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700 }}>🏝️ Tour Manager</Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>Search, filter, and manage your entire tour catalog.</Typography>
+            <Typography variant="h5" sx={{ fontWeight: 700, fontSize: { xs: '1.5rem', md: '2rem' } }}>🏝️ Tour Manager</Typography>
+            <Typography variant="body2" sx={{ opacity: 0.9, fontSize: { xs: '0.875rem', md: '1rem' } }}>Search, filter, and manage your entire tour catalog.</Typography>
           </Box>
-          <ActionButton variant="contained" startIcon={<AddIcon />} onClick={() => create("tours")} sx={{ backgroundColor: "white", color: tourTheme.colors.primary.main, "&:hover": { backgroundColor: "#f0f0f0" }, flexShrink: 0 }}>
+          <ActionButton 
+            variant="contained" 
+            startIcon={<AddIcon />} 
+            onClick={() => create("tours")} 
+            sx={{ 
+              backgroundColor: "white", 
+              color: tourTheme.colors.primary.main, 
+              "&:hover": { backgroundColor: "#f0f0f0" }, 
+              flexShrink: 0,
+              width: { xs: '100%', md: 'auto' }
+            }}
+          >
             Create Tour
           </ActionButton>
         </Stack>
         
         <Box component="form" onSubmit={handleSearchSubmit}>
-          <Stack direction="row" spacing={1}>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={1}>
             <SearchInput
               placeholder="Search by title, description, or tags..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               fullWidth
+              size={isMobile ? "small" : "medium"}
               InputProps={{
                 startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
                 endAdornment: search && (
@@ -92,14 +106,23 @@ export const TourListHeader: React.FC<TourListHeaderProps> = ({
                 )
               }}
             />
-            <Button type="submit" variant="contained" sx={{ backgroundColor: "rgba(255,255,255,0.2)", "&:hover": { backgroundColor: "rgba(255,255,255,0.3)" }, flexShrink: 0 }}>
+            <Button 
+              type="submit" 
+              variant="contained" 
+              sx={{ 
+                backgroundColor: "rgba(255,255,255,0.2)", 
+                "&:hover": { backgroundColor: "rgba(255,255,255,0.3)" }, 
+                flexShrink: 0,
+                width: { xs: '100%', md: 'auto' }
+              }}
+            >
               Apply
             </Button>
           </Stack>
         </Box>
 
-        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-            <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.7)', mr: 1, alignSelf: 'center' }}>Filters:</Typography>
+        <Stack direction="row" spacing={1} alignItems="flex-start" flexWrap="wrap" sx={{ gap: 1 }}>
+            <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.7)', mr: 1, alignSelf: 'center', display: { xs: 'none', md: 'block' } }}>Filters:</Typography>
             
             {Object.entries(flagConfig).map(([key, config]) => {
                 const state = filtersState[key as keyof typeof filtersState];
@@ -122,7 +145,7 @@ export const TourListHeader: React.FC<TourListHeaderProps> = ({
                 );
             })}
 
-            <Box sx={{ minWidth: 200 }}>
+            <Box sx={{ minWidth: { xs: '100%', md: 200 }, width: { xs: '100%', md: 'auto' } }}>
                 <SearchableCategorySelect
                     value={filtersState.category || ""}
                     onChange={(value) => setFiltersState((p: any) => ({ ...p, category: value }))}
@@ -137,7 +160,7 @@ export const TourListHeader: React.FC<TourListHeaderProps> = ({
                 />
             </Box>
 
-            <Box sx={{ minWidth: 150 }}>
+            <Box sx={{ minWidth: { xs: '100%', md: 150 }, width: { xs: '100%', md: 'auto' } }}>
               <FormControl size="small" fullWidth>
                 <InputLabel sx={{color: 'rgba(255,255,255,0.7)'}}>Location</InputLabel>
                 <Select
