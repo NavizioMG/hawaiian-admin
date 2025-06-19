@@ -67,9 +67,7 @@ export const TourDetailView: React.FC<TourDetailViewProps> = ({ tourId, onClose 
 
   const tour = data.data;
   // --- DEBUGGING STEP ---
-  // This will print the entire tour object to your browser's developer console.
-  console.log("Full tour data received in detail view:", tour);
-  
+ 
   const activeFlags = Object.entries(flagConfig).filter(([key]) => tour[key as keyof Tour] === true);
   const locationConfig = islandConfig[tour.location] || { emoji: "🏝️", color: "#607d8b", name: tour.location };
 
