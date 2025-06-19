@@ -16,7 +16,6 @@ import DiamondIcon from '@mui/icons-material/Diamond';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import HomeIcon from '@mui/icons-material/Home';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
 interface TourDetailViewProps {
   tourId: string;
@@ -44,7 +43,7 @@ const flagConfig = {
 const islandConfig: { [key: string]: { emoji: string; color: string; name: string; } } = {
   "Oahu": { emoji: "🏝️", color: "#2196f3", name: "Oahu" },
   "Maui": { emoji: "🌺", color: "#ff9800", name: "Maui" },
-  "Big Island": { emoji: "�", color: "#f44336", name: "Big Island" },
+  "Big Island": { emoji: "🌋", color: "#f44336", name: "Big Island" },
   "Kauai": { emoji: "🌿", color: "#4caf50", name: "Kauai" }
 };
 
@@ -66,8 +65,6 @@ export const TourDetailView: React.FC<TourDetailViewProps> = ({ tourId, onClose 
   }
 
   const tour = data.data;
-  // --- DEBUGGING STEP ---
- 
   const activeFlags = Object.entries(flagConfig).filter(([key]) => tour[key as keyof Tour] === true);
   const locationConfig = islandConfig[tour.location] || { emoji: "🏝️", color: "#607d8b", name: tour.location };
 
@@ -101,7 +98,6 @@ export const TourDetailView: React.FC<TourDetailViewProps> = ({ tourId, onClose 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} flexWrap="wrap">
             <Chip label={`${locationConfig.emoji} ${locationConfig.name}`} size="medium" />
             {tour.category && <Chip label={tour.category} size="medium" variant="outlined" />}
-            {tour.price && <Chip icon={<AttachMoneyIcon />} label={`$${tour.price}`} size="medium" color="success" />}
           </Stack>
           
           <Divider />
@@ -130,7 +126,6 @@ export const TourDetailView: React.FC<TourDetailViewProps> = ({ tourId, onClose 
             )}
           </Grid>
 
-          {/* Using your requested structure for the description */}
           {tour.description && (
             <DetailSection icon={<DescriptionIcon />} title="Tour Description">
               <Typography variant="body1" sx={{ lineHeight: 1.7, color: 'text.secondary', whiteSpace: 'pre-wrap' }}>
@@ -144,7 +139,6 @@ export const TourDetailView: React.FC<TourDetailViewProps> = ({ tourId, onClose 
                   <Typography variant="caption" fontFamily="monospace">ID: {tour.id}</Typography>
                   <Typography variant="caption" fontFamily="monospace">Item ID: {tour.item_id}</Typography>
                   <Typography variant="caption" fontFamily="monospace">Slug: {tour.slug}</Typography>
-                  {/* Adding description here as a diagnostic tool */}
                   <Typography variant="caption" fontFamily="monospace">Description (Raw): {tour.description || '--- NOT FOUND ---'}</Typography>
               </Stack>
           </DetailSection>
