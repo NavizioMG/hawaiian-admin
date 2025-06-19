@@ -1,5 +1,5 @@
 // /src/components/tours/tourGridColumns.tsx
-import { GridColDef } from "@mui/x-data-grid"; // <-- FIX: Removed GridRenderCellParams
+import { GridColDef } from "@mui/x-data-grid";
 import { Box, Typography, Tooltip, Chip, IconButton, Stack } from "@mui/material";
 import { EditButton } from "@refinedev/mui";
 import { SvgIconComponent } from "@mui/icons-material";
@@ -16,7 +16,7 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import { tourTheme } from "./styles/tourTheme";
 import { Tour } from "../../interfaces/tour";
 
-// ... (the rest of the file remains exactly the same)
+// ... (flagConfig and islandConfig remain the same)
 interface FlagConfig {
   icon: SvgIconComponent;
   color: string;
@@ -30,7 +30,6 @@ const flagConfig: { [key: string]: FlagConfig } = {
   show_on_homepage: { icon: HomeIcon, color: tourTheme.colors.status.homepage, label: "Homepage" },
   is_unforgettable: { icon: FavoriteIcon, color: tourTheme.colors.status.unforgettable, label: "Unforgettable" }
 };
-
 const islandConfig: { [key: string]: { emoji: string; color: string; name: string; } } = {
   "Oahu": { emoji: "🏝️", color: "#2196f3", name: "Oahu" },
   "Maui": { emoji: "🌺", color: "#ff9800", name: "Maui" },
@@ -50,7 +49,8 @@ export const getTourColumns = (
     flex: 1, 
     minWidth: 200,
     renderCell: ({ row }) => (
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ py: 1, height: '100%' }}>
+      // ALIGNMENT FIX: By ensuring the Stack fills the cell's height, alignItems works correctly.
+      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ height: '100%' }}>
         <img src={row.image} alt={row.title} style={{ width: 60, height: 40, objectFit: "cover", borderRadius: tourTheme.borderRadius.sm }}/>
         <Typography variant="subtitle2" sx={{ fontWeight: 600, lineHeight: 1.3 }}>{row.title}</Typography>
       </Stack>
@@ -79,6 +79,7 @@ export const getTourColumns = (
     ];
   }
 
+  // ... (Desktop columns remain the same)
   return [
     viewColumn,
     {
