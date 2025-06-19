@@ -346,7 +346,7 @@ export const ModernLayout: React.FC<ModernLayoutProps> = ({ children }) => {
           flexGrow: 1,
           backgroundColor: tourTheme.colors.neutral.background,
           minHeight: "100vh",
-          overflow: "hidden",
+          overflow: "auto",
           width: { xs: '100%', md: `calc(100% - ${isCollapsed ? collapsedDrawerWidth : drawerWidth}px)` },
         }}
       >

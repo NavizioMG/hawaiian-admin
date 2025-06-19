@@ -1,10 +1,11 @@
 // /src/components/tours/tourGridColumns.tsx
-import { GridColDef } from "@mui/x-data-grid";
-import { Box, Typography, Tooltip, Chip, IconButton } from "@mui/material";
+import { GridColDef } from "@mui/x-data-grid"; // <-- FIX: Removed GridRenderCellParams
+import { Box, Typography, Tooltip, Chip, IconButton, Stack } from "@mui/material";
 import { EditButton } from "@refinedev/mui";
 import { SvgIconComponent } from "@mui/icons-material";
 
-// Import all the necessary icons for the Status column
+// Import icons
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import StarIcon from "@mui/icons-material/Star";
 import DiamondIcon from "@mui/icons-material/Diamond";
 import PushPinIcon from "@mui/icons-material/PushPin";
@@ -15,7 +16,7 @@ import LaunchIcon from "@mui/icons-material/Launch";
 import { tourTheme } from "./styles/tourTheme";
 import { Tour } from "../../interfaces/tour";
 
-// Define a type for our flag configuration
+// ... (the rest of the file remains exactly the same)
 interface FlagConfig {
   icon: SvgIconComponent;
   color: string;
@@ -37,83 +38,126 @@ const islandConfig: { [key: string]: { emoji: string; color: string; name: strin
   "Kauai": { emoji: "🌿", color: "#4caf50", name: "Kauai" }
 };
 
-export const getTourColumns = (handleToggle: (id: string, field: string, current: boolean) => void): GridColDef<Tour>[] => [
-  {
-    field: "image",
-    headerName: "",
-    width: 90,
-    sortable: false,
-    renderCell: ({ row }) => (
-      <Box sx={{ p: 0.5 }}>
-        <img src={row.image} alt={row.title} style={{ width: 70, height: 48, objectFit: "cover", borderRadius: tourTheme.borderRadius.md }}/>
-      </Box>
-    ),
-  },
-  { 
+export const getTourColumns = (
+  handleToggle: (id: string, field: string, current: boolean) => void,
+  handleSelect: (tour: Tour) => void,
+  isMobile: boolean 
+): GridColDef<Tour>[] => {
+
+  const mobileTourColumn: GridColDef<Tour> = {
     field: "title", 
-    headerName: "Tour Details", 
-    flex: 2, 
-    minWidth: 250,
+    headerName: "Tour", 
+    flex: 1, 
+    minWidth: 200,
     renderCell: ({ row }) => (
-      <Box sx={{ py: 1 }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>{row.title}</Typography>
-        <Typography variant="caption" sx={{ color: "text.secondary" }}>ID: {row.item_id}</Typography>
-      </Box>
+      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ py: 1, height: '100%' }}>
+        <img src={row.image} alt={row.title} style={{ width: 60, height: 40, objectFit: "cover", borderRadius: tourTheme.borderRadius.sm }}/>
+        <Typography variant="subtitle2" sx={{ fontWeight: 600, lineHeight: 1.3 }}>{row.title}</Typography>
+      </Stack>
     )
-  },
-  {
-    field: "location",
-    headerName: "Island",
-    width: 120,
-    renderCell: ({ value }) => {
-      const config = islandConfig[value] || { emoji: "🏝️", color: "#607d8b", name: value };
-      return <Chip label={<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><span>{config.emoji}</span> {config.name}</Box>} sx={{ backgroundColor: `${config.color}15`, color: config.color, fontWeight: 600 }} />;
-    }
-  },
-  {
-    field: "category",
-    headerName: "Category",
-    width: 150,
-    renderCell: ({ value }) => (value ? <Chip label={value} size="small" variant="outlined" /> : null),
-  },
-  {
-    field: "status",
-    headerName: "Status",
-    width: 180,
-    sortable: false,
-    renderCell: ({ row }) => (
-      <Box sx={{ display: "flex", gap: 0.3 }}>
-        {Object.keys(flagConfig).map(flag => {
-          const config = flagConfig[flag];
-          const IconComponent = config.icon;
-          const isActive = row[flag as keyof Tour] as boolean;
-          return (
-            <Tooltip key={flag} title={`Toggle ${config.label}`}>
-              <IconButton size="small" onClick={() => handleToggle(row.id, flag, isActive)} sx={{ color: isActive ? config.color : "#ccc" }}>
-                <IconComponent fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          );
-        })}
-      </Box>
-    ),
-  },
-  {
-    field: "actions",
-    headerName: "Actions",
-    width: 100,
+  };
+
+  const viewColumn: GridColDef<Tour> = {
+    field: "view",
+    headerName: "",
+    width: 60,
     sortable: false,
     align: "center",
-    headerAlign: "center",
     renderCell: ({ row }) => (
-      <Box sx={{ display: "flex", gap: 0.5 }}>
-        <Tooltip title="View on FareHarbor">
-          <IconButton href={row.affiliate_url} target="_blank" size="small" sx={{ color: tourTheme.colors.secondary.ocean }}>
-            <LaunchIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <EditButton hideText recordItemId={row.id} size="small" />
-      </Box>
-    ), 
-  },
-];
+      <Tooltip title="View Details">
+        <IconButton onClick={() => handleSelect(row)} size="small">
+          <VisibilityIcon />
+        </IconButton>
+      </Tooltip>
+    )
+  };
+
+  if (isMobile) {
+    return [
+      mobileTourColumn,
+      viewColumn,
+    ];
+  }
+
+  return [
+    viewColumn,
+    {
+      field: "image",
+      headerName: "",
+      width: 90,
+      sortable: false,
+      renderCell: ({ row }) => (
+        <Box sx={{ p: 0.5 }}>
+          <img src={row.image} alt={row.title} style={{ width: 70, height: 48, objectFit: "cover", borderRadius: tourTheme.borderRadius.md }}/>
+        </Box>
+      ),
+    },
+    { 
+      field: "title_desktop",
+      headerName: "Tour Details", 
+      flex: 2, 
+      minWidth: 250,
+      renderCell: ({ row }) => (
+        <Box sx={{ py: 1 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>{row.title}</Typography>
+          <Typography variant="caption" sx={{ color: "text.secondary" }}>ID: {row.item_id}</Typography>
+        </Box>
+      )
+    },
+    {
+      field: "location",
+      headerName: "Island",
+      width: 120,
+      renderCell: ({ value }) => {
+        const config = islandConfig[value] || { emoji: "🏝️", color: "#607d8b", name: value };
+        return <Chip label={<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}><span>{config.emoji}</span> {config.name}</Box>} sx={{ backgroundColor: `${config.color}15`, color: config.color, fontWeight: 600 }} />;
+      }
+    },
+    {
+      field: "category",
+      headerName: "Category",
+      width: 150,
+      renderCell: ({ value }) => (value ? <Chip label={value} size="small" variant="outlined" /> : null),
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 180,
+      sortable: false,
+      renderCell: ({ row }) => (
+        <Box sx={{ display: "flex", gap: 0.3 }}>
+          {Object.keys(flagConfig).map(flag => {
+            const config = flagConfig[flag];
+            const IconComponent = config.icon;
+            const isActive = row[flag as keyof Tour] as boolean;
+            return (
+              <Tooltip key={flag} title={`Toggle ${config.label}`}>
+                <IconButton size="small" onClick={() => handleToggle(row.id, flag, isActive)} sx={{ color: isActive ? config.color : "#ccc" }}>
+                  <IconComponent fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            );
+          })}
+        </Box>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 100,
+      sortable: false,
+      align: "center",
+      headerAlign: "center",
+      renderCell: ({ row }) => (
+        <Box sx={{ display: "flex", gap: 0.5 }}>
+          <Tooltip title="View on FareHarbor">
+            <IconButton href={row.affiliate_url} target="_blank" size="small" sx={{ color: tourTheme.colors.secondary.ocean }}>
+              <LaunchIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <EditButton hideText recordItemId={row.id} size="small" />
+        </Box>
+      ), 
+    },
+  ];
+};

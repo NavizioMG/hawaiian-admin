@@ -1,13 +1,14 @@
 // /src/components/tours/TourList.tsx
-import { useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import { useDataGrid } from "@refinedev/mui";
 import { DataGrid, GridColDef, GridOverlay } from "@mui/x-data-grid";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Collapse, useTheme, useMediaQuery } from "@mui/material";
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import { Tour } from "../../interfaces/tour";
 import { useTourFilters } from "./hooks/useTourFilters";
 import { useTourActions } from "./hooks/useTourActions";
 import { getTourColumns } from "./tourGridColumns";
+import { TourDetailView } from "./TourDetailView";
 import { TourListHeader } from "./TourListHeader";
 import { PageContainer, ContentArea } from "./styles/styledComponents";
 
@@ -24,22 +25,38 @@ function CustomNoRowsOverlay() {
 }
 
 export const TourList = () => {
-  const { dataGridProps, setFilters } = useDataGrid<Tour>({
+  const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
+  const { handleToggle } = useTourActions();
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const handleSelectTour = (tour: Tour) => {
+    setSelectedTourId((currentId) => (currentId === tour.id ? null : tour.id));
+  };
+
+  const { dataGridProps, setFilters, tableQueryResult } = useDataGrid<Tour>({
     resource: "tours",
     pagination: { pageSize: 50 },
     hasPagination: true,
     syncWithLocation: true,
+    meta: {
+      select: "*",
+    },
   });
 
   const filterProps = useTourFilters(setFilters);
-  const { handleToggle } = useTourActions();
 
-  // This useEffect applies filters whenever the user changes a filter setting.
   useEffect(() => {
     filterProps.applyFilters();
   }, [filterProps.filtersState, filterProps.applyFilters]);
 
-  const columns: GridColDef<Tour>[] = getTourColumns(handleToggle);
+  // FIX: Pass handleToggle directly without wrapping it
+  const columns: GridColDef<Tour>[] = getTourColumns(
+    handleToggle,
+    handleSelectTour,
+    isMobile
+  );
 
   return (
     <PageContainer>
@@ -47,33 +64,33 @@ export const TourList = () => {
         {...filterProps} 
         tourData={dataGridProps.rows}
       />
-      
+      <Collapse in={!!selectedTourId}>
+        {selectedTourId && (
+          <TourDetailView tourId={selectedTourId} onClose={() => setSelectedTourId(null)} />
+        )}
+      </Collapse>
       <ContentArea>
-        <DataGrid 
-          {...dataGridProps} 
-          columns={columns}
-          density="compact"
-          pageSizeOptions={[25, 50, 100]}
-          disableRowSelectionOnClick
-          autoHeight
-          loading={dataGridProps.loading}
-          slots={{
-            noRowsOverlay: CustomNoRowsOverlay,
-          }}
-          sx={{ 
-            border: 0,
-            '& .MuiDataGrid-footerContainer': {
-                borderTop: `1px solid #e0e0e0`
-            },
-            '& .MuiDataGrid-columnHeaders': {
-              fontSize: { xs: '0.75rem', md: '0.875rem' }
-            },
-            '& .MuiDataGrid-cell': {
-              fontSize: { xs: '0.75rem', md: '0.875rem' },
-              padding: { xs: '4px 8px', md: '8px 16px' }
-            }
-          }}
-        />
+        <Box>
+          <DataGrid 
+            {...dataGridProps} 
+            columns={columns}
+            density="compact"
+            pageSizeOptions={[25, 50, 100]}
+            autoHeight
+            loading={tableQueryResult.isLoading}
+            slots={{ noRowsOverlay: CustomNoRowsOverlay }}
+            sx={{ 
+              border: 0,
+              '& .MuiDataGrid-footerContainer': { borderTop: `1px solid #e0e0e0` },
+              // FIX: This is the correct way to hide the header on mobile
+              ...(isMobile && {
+                '.MuiDataGrid-columnHeaders': {
+                  display: 'none',
+                },
+              }),
+            }}
+          />
+        </Box>
       </ContentArea>
     </PageContainer>
   );
